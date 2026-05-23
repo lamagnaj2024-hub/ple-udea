@@ -2,67 +2,82 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLE Workspace - Katherine Lamagna</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f1f5f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-        .grid { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        :root { --bg-main: #f1f5f9; --primary: #1e3a8a; --success: #10b981; --border: #cbd5e1; }
+        body { font-family: sans-serif; background-color: var(--bg-main); padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 16px; }
+        .grid { display: none; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
         .grid.active { display: grid; }
-        .card { border: 2px solid #ddd; padding: 10px; cursor: pointer; border-radius: 5px; }
-        .card.selected { border-color: green; background: #e8f5e9; }
-        .tab-btn { padding: 10px; cursor: pointer; background: #ddd; border: none; }
-        .tab-btn.active { background: #1e3a8a; color: white; }
+        .card { border: 2px solid var(--border); padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .card.selected { background: #f0fdf4; border-color: var(--success); }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; border-radius: 6px; background: #e2e8f0; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .editor { width: 100%; height: 120px; margin-top: 10px; }
+        .btn-trigger { background: var(--success); color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>PLE Workspace</h1>
-        <input type="text" id="nombre" placeholder="Tu nombre">
+        <input type="text" id="in-student" placeholder="Tu nombre" style="width:100%; padding:10px;">
         
-        <nav>
-            <button class="tab-btn active" onclick="verTab(this, 'leer')">Leer</button>
-            <button class="tab-btn" onclick="verTab(this, 'hacer')">Hacer</button>
+        <nav style="margin-top:20px;">
+            <button class="tab-btn active" onclick="switchTab(this, 'leer')">Leer</button>
+            <button class="tab-btn" onclick="switchTab(this, 'hacer')">Hacer</button>
+            <button class="tab-btn" onclick="switchTab(this, 'compartir')">Compartir</button>
         </nav>
 
-        <div id="leer" class="grid active"></div>
-        <div id="hacer" class="grid"></div>
+        <div id="pane-leer" class="grid active"></div>
+        <div id="pane-hacer" class="grid"></div>
+        <div id="pane-compartir" class="grid"></div>
 
         <h3>Reflexión</h3>
-        <textarea id="ref" oninput="contar()" style="width:100%; height:80px;"></textarea>
-        <p>Palabras: <span id="cuenta">0</span>/150</p>
+        <textarea id="txt-user-ref" class="editor" oninput="countWords()"></textarea>
+        <p>Palabras: <span id="word-lbl">0</span>/150</p>
 
-        <button onclick="compilar()">COMPILAR PDF</button>
-        <div id="resultado" style="margin-top:20px; border:1px solid #000; padding:10px; display:none;"></div>
+        <button class="btn-trigger" onclick="compileAndRenderPDF()">Compilar y Generar PDF</button>
+
+        <div id="render-target" style="margin-top:20px; border:1px solid #ccc; padding:20px; display:none;"></div>
     </div>
 
     <script>
-        function verTab(btn, id) {
+        const database = {
+            leer: [{n: "Google Scholar"}, {n: "Scopus"}, {n: "Dialnet"}],
+            hacer: [{n: "Canva"}, {n: "Genially"}, {n: "Mendeley"}],
+            compartir: [{n: "LinkedIn"}, {n: "WhatsApp"}]
+        };
+
+        function switchTab(btn, cat) {
             document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.getElementById('pane-' + cat).classList.add('active');
             btn.classList.add('active');
         }
 
-        function contar() {
-            let txt = document.getElementById('ref').value;
-            let n = txt.split(/\s+/).filter(w => w.length > 0).length;
-            document.getElementById('cuenta').innerText = n;
+        function countWords() {
+            const txt = document.getElementById('txt-user-ref').value;
+            const count = txt.split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('word-lbl').innerText = count;
         }
 
-        function compilar() {
-            let res = document.getElementById('resultado');
-            res.innerHTML = "<h3>Documento Final</h3><p>Nombre: " + document.getElementById('nombre').value + "</p><p>Reflexión: " + document.getElementById('ref').value + "</p>";
-            res.style.display = 'block';
+        function compileAndRenderPDF() {
+            const name = document.getElementById('in-student').value;
+            const ref = document.getElementById('txt-user-ref').value;
+            const target = document.getElementById('render-target');
+            target.innerHTML = `<h2>Reporte Final</h2><p>Estudiante: ${name}</p><p>Reflexión: ${ref}</p>`;
+            target.style.display = 'block';
         }
 
-        // Cargar tarjetas
-        ['leer', 'hacer'].forEach(cat => {
-            ['Herramienta A', 'Herramienta B'].forEach(t => {
-                let div = document.createElement('div');
+        // Inicializar tarjetas
+        Object.keys(database).forEach(cat => {
+            database[cat].forEach(tool => {
+                const div = document.createElement('div');
                 div.className = 'card';
-                div.innerText = t;
+                div.innerHTML = tool.n;
                 div.onclick = function() { this.classList.toggle('selected'); };
-                document.getElementById(cat).appendChild(div);
+                document.getElementById('pane-' + cat).appendChild(div);
             });
         });
     </script>
