@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLE Workspace - Katherine Lamagna</title>
+    <style>
+        /* ==========================================================================
+           ESTILOS DE LA INTERFAZ WEB DEL APLICATIVO
+           ========================================================================== */
+        :root {
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --primary: #1e3a8a;
+            --primary-accent: #3b82f6;
+            --success: #10b981;
+            --success-bg: #f0fdf4;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: var(--bg-card);
+            padding: 25px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--success);
+        }
+
+        header h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+        header p { margin: 5px 0 0 0; font-size: 0.95rem; color: var(--text-muted); }
+        header p span { color: var(--primary-accent); font-weight: 700; }
+
+        .step-box {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+        }
+
+        .step-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .help-txt {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            background: #f8fafc;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-accent);
+        }
+
+        /* Formulario editable paso 1 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .field-group { display: flex; flex-direction: column; }
+        .field-group label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; color: var(--text-muted); }
+        .field-group input { padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; color: var(--text-dark); transition: border 0.2s; }
+        .field-group input:focus { outline: none; border-color: var(--primary-accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* Matriz paso 2 */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #e2e8f0; padding: 5px; border-radius: 10px; }
+        .tab-btn { flex: 1; padding: 11px; border: none; border-radius: 6px; background: transparent; font-weight: 600; font-size: 0.9rem; cursor: pointer; color: var(--text-muted); }
+        .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        .grid { display: none; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+        .grid.active { display: grid; }
+
+        .card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .card img { width: 32px; height: 32px; object-fit: contain; border-radius: 6px; background: #f8fafc; padding: 2px; }
+        .card-info { flex: 1; }
+        .card h4 { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 700; }
+        .card p { margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; }
+        .card.selected { background: var(--success-bg); border-color: var(--success); }
+
+        /* Caja reflexión paso 3 */
+        .editor { width: 100%; height: 145px; padding: 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; font-family: inherit; resize: none; box-sizing: border-box; }
+        .editor:focus { outline: none; border-color: var(--primary-accent); }
+        .counter { text-align: right; margin-top: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); }
+
+        .btn-trigger { background: #10b981; color: white; padding: 15px 45px; font-size: 1.05rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; display: block; margin: 30px auto; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .btn-trigger:hover { background: #059669; }
+
+        /* RESULTADO FINAL: VISTA DE IMPRESIÓN AMIGABLE */
+        .print-area { background: #ffffff; padding: 40px 50px; border: 1px solid var(--border); border-radius: 12px; display: none; margin-top: 30px; }
+        
+        /* Estilos APA/UDEA del Documento Integrado */
+        .doc-body { font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.6; font-size: 11pt; }
+        .doc-header { background: #1e3a8a; color: #fff; padding: 20px; border-radius: 6px; margin-bottom: 25px; font-family: Arial, sans-serif; }
+        .doc-header .u { font-size: 12pt; font-weight: bold; text-transform: uppercase; }
+        .doc-header .p { font-size: 9.5pt; opacity: 0.9; }
+        
+        .doc-body h2 { font-family: Arial, sans-serif; font-size: 12pt; color: #1e3a8a; border-left: 4px solid #10b981; padding-left: 8px; margin-top: 30px; margin-bottom: 12px; text-transform: uppercase; }
+        
+        .cover-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 22px; border-radius: 8px; font-family: Arial, sans-serif; }
+        .cover-box .t { font-size: 13pt; font-weight: bold; margin-bottom: 12px; color: #0f172a; }
+        .cover-row { font-size: 10.5pt; margin-bottom: 5px; }
+        .cover-row strong { color: #475569; inline-size: 110px; display: inline-block; }
+
+        .doc-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: Arial, sans-serif; font-size: 9.5pt; }
+        .doc-table th { background: #1e3a8a; color: white; padding: 10px; text-align: left; font-weight: bold; }
+        .doc-table td { padding: 10px; border: 1px solid #cbd5e1; vertical-align: top; }
+        .doc-table tr:nth-child(even) { background: #f8fafc; }
+        
+        .app-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .app-row img { width: 20px; height: 20px; object-fit: contain; }
+
+        .placeholder-graph { border: 2px dashed #10b981; background: #f0fdf4; padding: 20px; text-align: center; border-radius: 8px; font-family: Arial, sans-serif; margin: 15px 0; font-size: 10pt; color: #15803d; font-weight: bold; }
+        .ref-box { background: #fafafa; border-left: 4px solid #1e3a8a; padding: 18px; font-style: italic; text-align: justify; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Aplicativo de Entornos Universitarios (PLE)</h1>
+            <p>Ecosistema de Aprendizaje Generado Automatizadamente por: <span>KATHERINE LAMAGNA</span> — UDEA</p>
+        </header>
+
+        <section class="step-box">
+            <div class="step-title"><span class="badge">1</span> Requisitos y Datos de la Presentación (Sección 1)</div>
+            <div class="help-txt">Rellena libremente cada parámetro según las pautas de tu entregable de posgrado. Al presionar el botón de abajo, se compilará tu carátula exacta.</div>
+            <div class="input-grid">
+                <div class="field-group"><label>Nombres y Apellidos del Estudiante</label><input type="text" id="in-student" placeholder="Ej. Katherine Lamagna"></div>
+                <div class="field-group"><label>Universidad / Institución Educativa</label><input type="text" id="in-uni" placeholder="Ej. Universidad para el Desarrollo Andino"></div>
+                <div class="field-group"><label>Programa Académico / Maestría</label><input type="text" id="in-master" placeholder="Ej. Maestría en Competencias Digitales para la Docencia Universitaria"></div>
+                <div class="field-group"><label>Asignatura / Curso Relacionado</label><input type="text" id="in-course" placeholder="Ej. Tecnologías Digitales Personales"></div>
+                <div class="field-group"><label>Docente / Evaluador Académico</label><input type="text" id="in-teacher" placeholder="Ej. Dr. Carlos Mendoza"></div>
+                <div class="field-group"><label>Fecha de Entrega / Mes y Año</label><input type="text" id="in-date" placeholder="Ej. Mayo de 2026"></div>
+            </div>
+        </section>
+
+        <section class="step-box">
+            <div class="step-title"><span class="badge">2</span> Mapeo de Aplicaciones (Capítulo 1 - Sección 2)</div>
+            <div class="help-txt">Elige las herramientas que integras en tu entorno. En el PDF final, se estructurarán en una matriz limpia acompañada de sus logotipos corporativos oficiales.</div>
+            
+            <nav class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'leer')">📚 Fuentes para Leer</button>
+                <button class="tab-btn" onclick="switchTab(this, 'hacer')">⚙️ Herramientas para Hacer</button>
+                <button class="tab-btn" onclick="switchTab(this, 'compartir')">🌍 Espacios para Compartir (PLN)</button>
+            </nav>
+
+            <div id="pane-leer" class="grid active"></div>
+            <div id="pane-hacer" class="grid"></div>
+            <div id="pane-compartir" class="grid"></div>
+        </section>
+
+        <section class="step-box">
+            <div class="step-title"><span class="badge">3</span> Tu Reflexión Personal (Sección 3)</div>
+            <div class="help-txt">Escribe o pega aquí el análisis cualitativo que tú misma has desarrollado. El sistema contabilizará los términos para asegurar que no pases el límite de 150 palabras.</div>
+            <textarea id="txt-user-ref" class="editor" placeholder="Escribe tu reflexión original aquí... El aplicativo mantendrá tus líneas intactas."></textarea>
+            <div class="counter">Contador dinámico: <span id="word-lbl" style="font-weight:bold; color:var(--primary-accent);">0</span> / 150 palabras máximas</div>
+        </section>
+
+        <button class="btn-trigger" onclick="compileAndRenderPDF()">Compilar Presentación y Exportar PDF</button>
+
+        <section class="print-area" id="result-area">
+            <div style="text-align: right; margin-bottom: 20px; font-family: Arial, sans-serif;">
+                <button onclick="window.print()" style="background:#1e3a8a; color:white; border:none; padding:10px 20px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.9rem;">📥 Guardar como PDF Amigable</button>
+            </div>
+            
+            <div class="doc-body" id="render-target">
+                </div>
+        </section>
+    </div>
+
+    <script>
+        // Base de datos oficial con logotipos reales de alta resolución para el reporte visual
+        const database = {
+            leer: [
+                {n: "Google Scholar", d: "Búsqueda de literatura científica arbitrada e indexada.", i: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg"},
+                {n: "Scopus", d: "Indexación internacional de citas bibliográficas de alto impacto.", i: "https://cdn.worldvectorlogo.com/logos/scopus.svg"},
+                {n: "Dialnet", d: "Repositorio y base de datos de literatura científica hispana.", i: "https://dialnet.unirioja.es/imagenes/logos/dialnet.png"},
+                {n: "SciELO", d: "Biblioteca virtual electrónica de revistas científicas abiertas.", i: "https://scielo.org/wp-content/themes/scielo-v3/images/scielo-triple.svg"},
+                {n: "ERIC", d: "Base de datos digital especializada en ciencias de la educación.", i: "https://eric.ed.gov/images/eric_logo.png"}
+            ],
+            hacer: [
+                {n: "Canva", d: "Edición y síntesis gráfica de infografías y recursos didácticos.", i: "https://upload.wikimedia.org/wikipedia/commons/0/08/Canva_icon_2021.svg"},
+                {n: "Genially", d: "Creación de contenidos interactivos y presentaciones animadas.", i: "https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,g_face,z_auto/v1481105995/tzmxtq3tpsmep89x6xge.png"},
+                {n: "Mendeley", d: "Gestor y organizador de carpetas de documentos e investigación.", i: "https://upload.wikimedia.org/wikipedia/commons/8/85/Mendeley_Logo.svg"},
+                {n: "Zotero", d: "Software libre para captura y automatización de referencias en APA 7.", i: "https://www.zotero.org/static/images/theme/zotero_logo_256x256.png"},
+                {n: "Google Docs", d: "Procesamiento y co-diseño colaborativo de textos en la nube.", i: "https://upload.wikimedia.org/wikipedia/commons/0/01/Google_Docs_logo_%282014-2020%29.svg"}
+            ],
+            compartir: [
+                {n: "LinkedIn", d: "Red académica y profesional para consolidar identidad digital.", i: "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.svg"},
+                {n: "Microsoft Teams", d: "Canal institucional de comunicación síncrona y foros.", i: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg"},
+                {n: "WhatsApp", d: "Coordinación inmediata, mensajería instantánea y avisos ágiles.", i: "https
