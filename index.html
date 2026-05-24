@@ -3,83 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLE Workspace - Katherine Lamagna</title>
+    <title>PLE Studio Profesional - UDEA</title>
     <style>
-        :root { --bg-main: #f1f5f9; --primary: #1e3a8a; --success: #10b981; --border: #cbd5e1; }
-        body { font-family: sans-serif; background-color: var(--bg-main); padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 25px; border-radius: 16px; }
-        .grid { display: none; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 15px; }
+        :root {
+            --bg-main: #f1f5f9; --bg-card: #ffffff; --primary: #1e3a8a; --primary-accent: #3b82f6;
+            --success: #10b981; --success-bg: #f0fdf4; --text-dark: #0f172a; --text-muted: #64748b; --border: #cbd5e1;
+        }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-dark); margin: 0; padding: 30px 15px; line-height: 1.5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { background: var(--bg-card); padding: 25px 30px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-bottom: 25px; border-left: 6px solid var(--primary); }
+        header h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+        header p { margin: 5px 0 0 0; font-size: 0.95rem; color: var(--text-muted); }
+        .step-box { background: var(--bg-card); border-radius: 16px; padding: 25px 30px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        .step-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .badge { background: var(--primary); color: white; border-radius: 50%; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; }
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .field-group { display: flex; flex-direction: column; }
+        .field-group label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; color: var(--text-muted); }
+        .field-group input { padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: #e2e8f0; padding: 5px; border-radius: 10px; }
+        .tab-btn { flex: 1; padding: 11px; border: none; border-radius: 6px; background: transparent; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+        .tab-btn.active { background: #ffffff; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .grid { display: none; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
         .grid.active { display: grid; }
-        .card { border: 2px solid var(--border); padding: 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .card.selected { background: #f0fdf4; border-color: var(--success); }
-        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; border-radius: 6px; background: #e2e8f0; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .editor { width: 100%; height: 120px; margin-top: 10px; }
-        .btn-trigger { background: var(--success); color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .card { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; cursor: pointer; transition: all 0.2s; }
+        .card h4 { margin: 0 0 3px 0; font-size: 0.95rem; font-weight: 700; }
+        .card p { margin: 0; font-size: 0.78rem; color: var(--text-muted); }
+        .card.selected { background: var(--success-bg); border-color: var(--success); }
+        .editor { width: 100%; height: 145px; padding: 15px; border: 1px solid var(--border); border-radius: 10px; }
+        .btn-trigger { background: #10b981; color: white; padding: 15px 45px; font-size: 1.05rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; display: block; margin: 30px auto; }
+        .print-area { background: #ffffff; padding: 40px; border: 1px solid var(--border); display: none; margin-top: 30px; }
+        .doc-body { font-family: 'Times New Roman', Times, serif; }
+        .doc-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10pt; }
+        .doc-table th { background: #1e3a8a; color: white; padding: 10px; text-align: left; }
+        .doc-table td { padding: 10px; border: 1px solid #cbd5e1; }
+        .ref-box { background: #fafafa; border-left: 4px solid #1e3a8a; padding: 18px; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PLE Workspace</h1>
-        <input type="text" id="in-student" placeholder="Tu nombre" style="width:100%; padding:10px;">
-        
-        <nav style="margin-top:20px;">
-            <button class="tab-btn active" onclick="switchTab(this, 'leer')">Leer</button>
-            <button class="tab-btn" onclick="switchTab(this, 'hacer')">Hacer</button>
-            <button class="tab-btn" onclick="switchTab(this, 'compartir')">Compartir</button>
-        </nav>
-
-        <div id="pane-leer" class="grid active"></div>
-        <div id="pane-hacer" class="grid"></div>
-        <div id="pane-compartir" class="grid"></div>
-
-        <h3>Reflexión</h3>
-        <textarea id="txt-user-ref" class="editor" oninput="countWords()"></textarea>
-        <p>Palabras: <span id="word-lbl">0</span>/150</p>
-
-        <button class="btn-trigger" onclick="compileAndRenderPDF()">Compilar y Generar PDF</button>
-
-        <div id="render-target" style="margin-top:20px; border:1px solid #ccc; padding:20px; display:none;"></div>
+        <header><h1>PLE Architect Workspace v4</h1><p>Mapeo de Entornos Universitarios — UDEA</p></header>
+        <section class="step-box">
+            <div class="step-title"><span class="badge">1</span> Configuración</div>
+            <div class="input-grid">
+                <div class="field-group"><label>Nombres</label><input type="text" id="in-student"></div>
+                <div class="field-group"><label>Universidad</label><input type="text" id="in-uni"></div>
+                <div class="field-group"><label>Programa</label><input type="text" id="in-master"></div>
+                <div class="field-group"><label>Asignatura</label><input type="text" id="in-course"></div>
+                <div class="field-group"><label>Docente</label><input type="text" id="in-teacher"></div>
+                <div class="field-group"><label>Fecha</label><input type="text" id="in-date"></div>
+            </div>
+        </section>
+        <section class="step-box">
+            <div class="step-title"><span class="badge">2</span> 60 Aplicativos</div>
+            <nav class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this, 'leer')">📚 Leer (20)</button>
+                <button class="tab-btn" onclick="switchTab(this, 'hacer')">⚙️ Hacer (20)</button>
+                <button class="tab-btn" onclick="switchTab(this, 'compartir')">🌍 Compartir (20)</button>
+            </nav>
+            <div id="pane-leer" class="grid active"></div>
+            <div id="pane-hacer" class="grid"></div>
+            <div id="pane-compartir" class="grid"></div>
+        </section>
+        <section class="step-box">
+            <div class="step-title"><span class="badge">3</span> Reflexión</div>
+            <textarea id="txt-user-ref" class="editor" oninput="checkWords()"></textarea>
+            <div class="counter">Palabras: <span id="word-lbl">0</span> / 150</div>
+        </section>
+        <button class="btn-trigger" onclick="compileAndRenderPDF()">GENERAR REPORTE</button>
+        <section class="print-area" id="result-area">
+            <button onclick="window.print()">📥 Imprimir PDF</button>
+            <div class="doc-body" id="render-target"></div>
+        </section>
     </div>
-
     <script>
         const database = {
-            leer: [{n: "Google Scholar"}, {n: "Scopus"}, {n: "Dialnet"}],
-            hacer: [{n: "Canva"}, {n: "Genially"}, {n: "Mendeley"}],
-            compartir: [{n: "LinkedIn"}, {n: "WhatsApp"}]
+            leer: ["Google Scholar", "Scopus", "SciELO", "Dialnet", "ERIC", "PubMed", "JSTOR", "IEEE Xplore", "ResearchGate", "Academia.edu", "DOAJ", "CORE", "BASE", "WorldCat", "Springer", "Wiley", "Emerald", "Google Books", "OpenAlex", "Redalyc"],
+            hacer: ["Canva", "Genially", "Mendeley", "Zotero", "Google Docs", "Notion", "Trello", "MindMeister", "Prezi", "Lucidchart", "Evernote", "Slack", "Zoom", "Google Meet", "Obsidian", "Logseq", "Figma", "ClickUp", "Asana", "Jira"],
+            compartir: ["LinkedIn", "WhatsApp", "YouTube", "Discord", "X", "Facebook", "Instagram", "TikTok", "Medium", "Substack", "GitHub", "Behance", "Dribbble", "SlideShare", "Telegram", "Signal", "Skype", "Quora", "Reddit", "Pinterest"]
         };
-
-        function switchTab(btn, cat) {
-            document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('pane-' + cat).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        function countWords() {
-            const txt = document.getElementById('txt-user-ref').value;
-            const count = txt.split(/\s+/).filter(w => w.length > 0).length;
-            document.getElementById('word-lbl').innerText = count;
-        }
-
-        function compileAndRenderPDF() {
-            const name = document.getElementById('in-student').value;
-            const ref = document.getElementById('txt-user-ref').value;
-            const target = document.getElementById('render-target');
-            target.innerHTML = `<h2>Reporte Final</h2><p>Estudiante: ${name}</p><p>Reflexión: ${ref}</p>`;
-            target.style.display = 'block';
-        }
-
-        // Inicializar tarjetas
-        Object.keys(database).forEach(cat => {
-            database[cat].forEach(tool => {
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = tool.n;
-                div.onclick = function() { this.classList.toggle('selected'); };
-                document.getElementById('pane-' + cat).appendChild(div);
+        function populateWorkspace(dim) {
+            const panel = document.getElementById(`pane-${dim}`);
+            database[dim].forEach(item => {
+                const card = document.createElement('div');
+                card.className = "card";
+                card.setAttribute('data-name', item); card.setAttribute('data-dim', dim);
+                card.onclick = function() { this.classList.toggle('selected'); };
+                card.innerHTML = `<h4>${item}</h4>`;
+                panel.appendChild(card);
             });
-        });
+        }
+        function switchTab(btn, target) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`pane-${target}`).classList.add('active');
+        }
+        function checkWords() {
+            const v = document.getElementById('txt-user-ref').value.trim();
+            document.getElementById('word-lbl').textContent = v === "" ? 0 : v.split(/\s+/).length;
+        }
+        function compileAndRenderPDF() {
+            const sel = document.querySelectorAll('.card.selected');
+            let leer=[], hacer=[], compartir=[];
+            sel.forEach(e => {
+                const d = e.getAttribute('data-dim');
+                if(d === 'leer') leer.push(e.innerText); else if(d === 'hacer') hacer.push(e.innerText); else compartir.push(e.innerText);
+            });
+            document.getElementById('render-target').innerHTML = `<h2>Reporte PLE</h2><table class="doc-table"><tr><td><strong>Leer</strong></td><td>${leer.join(', ')}</td></tr><tr><td><strong>Hacer</strong></td><td>${hacer.join(', ')}</td></tr><tr><td><strong>Compartir</strong></td><td>${compartir.join(', ')}</td></tr></table><div class="ref-box">${document.getElementById('txt-user-ref').value}</div>`;
+            document.getElementById('result-area').style.display = 'block';
+        }
+        window.onload = () => { populateWorkspace('leer'); populateWorkspace('hacer'); populateWorkspace('compartir'); };
     </script>
 </body>
 </html>
